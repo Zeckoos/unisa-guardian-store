@@ -77,7 +77,7 @@ export interface Product extends Model {
   image?: string
   reviews?: Review[]
   deletedDate?: string
-  deletedAt?: Date | string
+  deletedAt?: Date | string | null // Added for exploit checking
   useForChristmasSpecialChallenge?: boolean
   keywordsForPastebinDataLeakChallenge?: string[]
   urlForProductTamperingChallenge?: string

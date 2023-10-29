@@ -7,6 +7,7 @@ import { Request, Response, NextFunction } from 'express'
 import { BasketItemModel } from '../models/basketitem'
 import { QuantityModel } from '../models/quantity'
 import challengeUtils = require('../lib/challengeUtils')
+import { ProductModel } from '../models/product'
 
 const utils = require('../lib/utils')
 const challenges = require('../data/datacache').challenges
@@ -17,7 +18,7 @@ interface RequestWithRawBody extends Request {
 }
 
 module.exports.addBasketItem = function addBasketItem () {
-  return (req: RequestWithRawBody, res: Response, next: NextFunction) => {
+  return async (req: RequestWithRawBody, res: Response, next: NextFunction) => {
     const result = utils.parseJsonCustom(req.rawBody)
     const productIds = []
     const basketIds = []
@@ -32,7 +33,12 @@ module.exports.addBasketItem = function addBasketItem () {
         quantities.push(result[i].value)
       }
     }
-
+    // Check whether item is deleted as to avoid hidden items being ordered through exploits
+    const product = await ProductModel.findOne({ where: { id: productIds[productIds.length - 1] } })
+    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+    if (!product || product.deletedAt) {
+      return res.status(401).send('Unauthorised: Product is deleted or does not exist.')
+    }
     const user = security.authenticatedUsers.from(req)
     if (user && basketIds[0] && basketIds[0] !== 'undefined' && Number(user.bid) != Number(basketIds[0])) { // eslint-disable-line eqeqeq
       res.status(401).send('{\'error\' : \'Invalid BasketId\'}')

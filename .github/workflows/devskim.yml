@@ -1,0 +1,20 @@
+name: DevSkim Security Scan
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    devskim_scan:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+
+      - name: Install DevSkim CLI
+        run: nuget install Microsoft.CST.DevSkim.CLI -OutputDirectory ./
+  
+      - name: Run DevSkim
+        run: ./Microsoft.CST.DevSkim.CLI/tools/netcoreapp3.1/DevSkim analyze ./
+  
