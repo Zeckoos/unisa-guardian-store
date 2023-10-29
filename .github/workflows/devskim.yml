@@ -1,29 +1,22 @@
-name: DevSkim Security Scan
+name: "DevSkim Security Scan"
 
-on:
-  push:
-  pull_request:
-    branches:
-      - main
-      - develop
+on : [push, pull_request]
 
 jobs:
-  devskim_scan:
-    runs-on: ubuntu-latest
+  devskim-scan:
+    name: DevSkim
+    runs-on: ubuntu-20.04
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2 #v2: v2.3.4 available
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup .NET SDK
-      run: |
-        wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-        sudo dpkg -i packages-microsoft-prod.deb
-        sudo apt-get update
-        sudo apt-get install -y dotnet-sdk-5.0
+      - name: Run DevSkim scanner
+        uses: microsoft/DevSkim-Action@v1
+        with:
+          directory-to-scan: routes
 
-    - name: Install DevSkim CLI
-      run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
-
-    - name: Run DevSkim
-      run: devskim analyze ./
   
