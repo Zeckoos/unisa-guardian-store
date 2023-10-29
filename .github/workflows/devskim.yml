@@ -12,10 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
+      uses: actions/checkout@v2 #v2: v2.3.4 available
 
-    - name: Install .NET SDK
-      run: sudo apt-get install -y dotnet-sdk-5.0
+    - name: Setup .NET SDK
+      run: |
+        wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        sudo apt-get update
+        sudo apt-get install -y dotnet-sdk-5.0
 
     - name: Install DevSkim CLI
       run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
